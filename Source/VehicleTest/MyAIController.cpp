@@ -21,7 +21,7 @@ void AMyAIController::BeginPlay()
 		DelayTimerHandle,
 		this,
 		&AMyAIController::StartMove,
-		2.0f,
+		3.0f,
 		false);
 
 	m_defaultMaxSpeed = m_maxSpeed;
@@ -64,7 +64,7 @@ void AMyAIController::StartMove()
 {
 	APawn* MyPawn = GetPawn();
 	FVector StartLocation = MyPawn->GetActorLocation();
-	FVector EndLocation = FVector(2680.0, 2260.0, 50.0126); // 目的地
+	FVector EndLocation = FVector(-3800.0, -3530.0, 0.0); // 目的地
 
 	// Navigation System を取得
 	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
@@ -100,6 +100,10 @@ void AMyAIController::StartMove()
 		{
 			Viz->SetPathPoints(Points);
 			m_owningSplineActor = Viz;
+
+			// 途中到達判定とする場合の場所
+			FVector goal(-10.0, -1160.0, 0.0f);
+			m_goalPercent = GetPercentSplineLocation(m_owningSplineActor->GetSplineComponent(), goal);
 		}
 
 		m_modelAIState = EModelAIState::MOVE;
@@ -110,6 +114,13 @@ void AMyAIController::Move(float DeltaSeconds)
 {
 	if (m_owningSplineActor)
 	{
+		// 到達判定
+		float currentPercent = GetPercentSplineLocation(m_owningSplineActor->GetSplineComponent(), GetPawn()->GetActorLocation());
+		if (currentPercent >= m_goalPercent)
+		{
+			m_modelAIState = EModelAIState::IDLE;
+		}
+
 		float steering = CalcSteeringInput(m_owningSplineActor->GetSplineComponent());
 		m_owningVehicleComp->SetSteeringInput(steering);
 
@@ -271,6 +282,50 @@ void AMyAIController::VehicleSpeedControl()
 		m_owningVehicleComp->SetThrottleInput(0);
 		m_owningVehicleComp->SetHandbrakeInput(false);
 	}
+}
+
+float AMyAIController::GetPercentSplineLocation(USplineComponent* spline, FVector location)
+{
+	
+	float InputKey = spline->FindInputKeyClosestToWorldLocation(location);
+	//UKismetSystemLibrary::PrintString(
+	//	this,                 // WorldContextObject（例: this）
+	//	FString::SanitizeFloat(InputKey), // 表示したい文字列
+	//	true,                 // 画面に表示するか
+	//	true,                 // Output Log に出すか
+	//	FLinearColor::Yellow, // 文字色
+	//	180.0f                  // 表示時間（秒）
+	//);
+	float DistanceAlong = spline->GetDistanceAlongSplineAtSplineInputKey(InputKey);
+	//UKismetSystemLibrary::PrintString(
+	//	this,                 // WorldContextObject（例: this）
+	//	FString::SanitizeFloat(DistanceAlong), // 表示したい文字列
+	//	true,                 // 画面に表示するか
+	//	true,                 // Output Log に出すか
+	//	FLinearColor::Blue, // 文字色
+	//	180.0f                  // 表示時間（秒）
+	//);
+	float TotalSplineLength = spline->GetSplineLength();
+	//UKismetSystemLibrary::PrintString(
+	//	this,                 // WorldContextObject（例: this）
+	//	FString::SanitizeFloat(TotalSplineLength), // 表示したい文字列
+	//	true,                 // 画面に表示するか
+	//	true,                 // Output Log に出すか
+	//	FLinearColor::Red, // 文字色
+	//	180.0f                  // 表示時間（秒）
+	//);
+	float PercentAlong = (TotalSplineLength > 0.0f)
+		? (DistanceAlong / TotalSplineLength)
+		: 0.0f;
+	UKismetSystemLibrary::PrintString(
+		this,                 // WorldContextObject（例: this）
+		FString::SanitizeFloat(PercentAlong), // 表示したい文字列
+		true,                 // 画面に表示するか
+		true,                 // Output Log に出すか
+		FLinearColor::Green, // 文字色
+		180.0f                  // 表示時間（秒）
+	);
+	return PercentAlong;
 }
 
 

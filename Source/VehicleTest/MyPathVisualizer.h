@@ -16,8 +16,9 @@ public:
     AMyPathVisualizer();
 
     // 経路ポイント配列をセット
-    void SetPathPoints(const TArray<FVector>& Points);
+    //void SetPathPoints(const TArray<FVector>& Points);
     USplineComponent* GetSplineComponent() { return SplineComponent; }
+    void SetPathPoints(const TArray<FVector>& Points, float Offset = 100);
 
 protected:
     virtual void BeginPlay() override;
@@ -29,5 +30,6 @@ protected:
     UMaterialInterface* SpriteMaterial; // スプライトに使うマテリアル
 
 private:
+    
     void CreatePointSprite(const FVector& WorldLocation);
 };

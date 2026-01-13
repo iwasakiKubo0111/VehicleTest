@@ -39,6 +39,8 @@ class VEHICLETEST_API AMyAIController : public AAIController
 
 	void VehicleSpeedControl();
 
+	float GetPercentSplineLocation(USplineComponent* spline,FVector location);
+
 	FTimerHandle DelayTimerHandle;
 
 	EModelAIState m_modelAIState = EModelAIState::IDLE;
@@ -58,6 +60,7 @@ class VEHICLETEST_API AMyAIController : public AAIController
 	float m_yawDelta = 0;
 	float m_targetSpeed = 0;
 	float m_maxWheelSpinRotation = 0;
-	bool m_isForward = false;
+	bool m_isForward = true;
+	float m_goalPercent = 0;
 	FVector m_offsetTangentLocation;
 };

@@ -30,6 +30,14 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// タイマーで呼ばれる2回目の出力
+	void LogActorBoundsSecond();
+
+	virtual void GetActorBounds(bool bOnlyCollidingComponents, FVector& Origin, FVector& BoxExtent, bool bIncludeFromChildActors = false) const override;
+
+	// タイマー
+	FTimerHandle TimerHandle_BoundsSecond;
+
 	/** vehicle simulation component */
 	UPROPERTY(Category = Vehicle, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UChaosVehicleMovementComponent> m_vehicleMovementComponent;
