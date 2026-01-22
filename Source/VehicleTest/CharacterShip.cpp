@@ -12,9 +12,6 @@ ACharacterShip::ACharacterShip()
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
-    SetRootComponent(GetMesh());
-    GetCapsuleComponent()->DestroyComponent();
-
 }
 
 // Called when the game starts or when spawned
@@ -24,7 +21,7 @@ void ACharacterShip::BeginPlay()
 
     //GetCapsuleComponent();
 
-
+    GetMesh()->SetSimulatePhysics(true);
 
     LogActorBoundsSecond();
 
@@ -44,6 +41,16 @@ void ACharacterShip::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+}
+
+void ACharacterShip::PreInitializeComponents()
+{
+    Super::PreInitializeComponents();
+
+    SetRootComponent(GetMesh());
+    GetCapsuleComponent()->DestroyComponent();
+
+    GetMesh()->SetSimulatePhysics(false);
 }
 
 // Called to bind functionality to input

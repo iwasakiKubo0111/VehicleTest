@@ -19,7 +19,7 @@ void AShipAIController::BeginPlay()
 		DelayTimerHandle,
 		this,
 		&AShipAIController::StartMove,
-		3.0f,
+		5.0f,
 		false);
 
 	m_defaultMaxSpeed = m_maxSpeed;
